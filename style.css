@@ -46,6 +46,47 @@ body {
   overflow: hidden;
 }
 
+.start-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  background:
+    radial-gradient(900px 460px at 50% 74%, rgba(251, 214, 139, 0.16), rgba(251, 214, 139, 0) 58%),
+    linear-gradient(to top, rgba(6, 10, 15, 0.54), rgba(6, 10, 15, 0.2) 42%, rgba(6, 10, 15, 0.04) 65%, rgba(6, 10, 15, 0));
+}
+
+.start-overlay.hidden {
+  display: none;
+}
+
+.start-script {
+  font-family: "Brush Script MT", "Snell Roundhand", "Segoe Script", cursive;
+  font-size: clamp(2.25rem, 7vw, 5rem);
+  line-height: 1;
+  color: #f8d47e;
+  letter-spacing: 0.02em;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.12),
+    0 8px 16px rgba(0, 0, 0, 0.45);
+  user-select: none;
+}
+
+.start-script::after {
+  content: "";
+  display: block;
+  width: 58%;
+  margin: 0.22rem auto 0;
+  border-bottom: 1px solid rgba(248, 212, 126, 0.5);
+}
+
+.start-overlay:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: -3px;
+}
+
 .frame {
   position: absolute;
   inset: 0;
@@ -92,6 +133,12 @@ body {
 .nav-btn:focus-visible {
   outline: 2px solid #ffffff;
   outline-offset: 2px;
+}
+
+.nav-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+  transform: none;
 }
 
 @media (max-width: 720px) {

@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <audio id="song" src="https://carlosnoyes.github.io/birthday-card/audio/song.mp3" autoplay loop preload="auto" muted></audio>
+  <audio id="song" src="https://carlosnoyes.github.io/birthday-card/audio/song.mp3" loop preload="metadata" playsinline></audio>
 
   <main class="stage" aria-label="Photo slideshow">
     <button id="prevBtn" class="nav-btn" type="button" aria-label="Previous slide">&#10094;</button>
@@ -15,6 +15,9 @@
     <div id="frameStack" class="frame-stack" aria-live="polite">
       <img id="frameA" class="frame active" src="" alt="Slideshow image" />
       <img id="frameB" class="frame" src="" alt="Slideshow image" />
+      <div id="startOverlay" class="start-overlay" role="button" tabindex="0" aria-label="Tap or click to start slideshow and music">
+        <span class="start-script">Tap to Start</span>
+      </div>
     </div>
 
     <button id="nextBtn" class="nav-btn" type="button" aria-label="Next slide">&#10095;</button>

@@ -8,11 +8,12 @@ const FRAME_COUNT = 20;
 const CROSSFADE_MS = 1800;
 const ORIGINAL_MS = 3000;
 const FANTASY_MS = 7000;
+const ASSET_BASE = "https://carlosnoyes.github.io/birthday-card";
 
 const frames = Array.from({ length: FRAME_COUNT }, (_, i) => {
   const n = i + 1;
   const ext = n % 2 === 1 ? "jpg" : "png";
-  return `slideshow/${n}.${ext}`;
+  return `${ASSET_BASE}/slideshow/${n}.${ext}`;
 });
 
 let current = 0;

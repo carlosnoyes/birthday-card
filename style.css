@@ -1,509 +1,145 @@
-/* ============================================================
-   Birthday Card — style.css
-   ============================================================ */
+﻿:root {
+  --bg: #0d141b;
+  --panel: #121b24;
+  --edge: rgba(255, 255, 255, 0.18);
+  --btn-bg: rgba(255, 255, 255, 0.08);
+  --btn-bg-hover: rgba(255, 255, 255, 0.14);
+  --btn-text: #f4f4f4;
+}
 
-*, *::before, *::after {
+* {
   box-sizing: border-box;
+}
+
+html,
+body {
   margin: 0;
-  padding: 0;
-}
-
-:root {
-  --gold: #c9a84c;
-  --gold-light: #f0d080;
-  --cream: #fdf8f0;
-  --deep: #1a1209;
-  --warm: #3d2a0a;
-  --text: #2a1f0a;
-  --section-gap: 100vh;
-  font-size: 16px;
-}
-
-html {
-  scroll-behavior: smooth;
-  scroll-snap-type: y mandatory;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(1300px 700px at 20% 10%, #1e2f3a, var(--bg));
 }
 
 body {
-  background: var(--deep);
-  color: var(--cream);
-  font-family: 'Georgia', 'Times New Roman', serif;
-  overflow-x: hidden;
-  line-height: 1.6;
+  font-family: Georgia, "Times New Roman", serif;
 }
 
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--deep); }
-::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
-
-/* ============================================================
-   HERO SECTION
-   ============================================================ */
-#hero {
-  position: relative;
+.stage {
+  width: 100vw;
   height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  scroll-snap-align: start;
-  overflow: hidden;
-}
-
-#hero-video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.55;
-}
-
-#hero-fallback {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.55;
-  display: none;
-}
-
-.hero-overlay {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  padding: 2rem;
-}
-
-.hero-subtitle {
-  font-size: clamp(0.9rem, 2.5vw, 1.2rem);
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  color: var(--gold-light);
-  opacity: 0;
-  animation: fadeUp 1s ease 0.5s forwards;
-}
-
-.hero-title {
-  font-size: clamp(2.5rem, 10vw, 6rem);
-  font-weight: 400;
-  color: #fff;
-  line-height: 1.1;
-  margin: 0.4rem 0 1rem;
-  opacity: 0;
-  animation: fadeUp 1s ease 1s forwards;
-  text-shadow: 0 2px 30px rgba(0,0,0,0.6);
-}
-
-.hero-title span {
-  color: var(--gold-light);
-  display: block;
-}
-
-.hero-scroll-hint {
-  position: absolute;
-  bottom: 2.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  opacity: 0;
-  animation: fadeIn 1s ease 2.5s forwards;
-  cursor: pointer;
-}
-
-.hero-scroll-hint span {
-  font-size: 0.75rem;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--gold-light);
-}
-
-.scroll-arrow {
-  width: 24px;
-  height: 24px;
-  border-right: 2px solid var(--gold-light);
-  border-bottom: 2px solid var(--gold-light);
-  transform: rotate(45deg);
-  animation: bounce 1.5s ease infinite;
-}
-
-/* ============================================================
-   CHAPTERS (general section styles)
-   ============================================================ */
-.chapter {
-  min-height: 100vh;
-  scroll-snap-align: start;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 5rem 2rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.chapter-label {
-  font-size: 0.7rem;
-  letter-spacing: 0.5em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 0.75rem;
-  opacity: 0;
-  transition: opacity 0.8s ease, transform 0.8s ease;
-  transform: translateY(20px);
-}
-
-.chapter-title {
-  font-size: clamp(1.8rem, 6vw, 3.5rem);
-  font-weight: 400;
-  color: #fff;
-  text-align: center;
-  margin-bottom: 1.5rem;
-  opacity: 0;
-  transition: opacity 0.8s ease 0.15s, transform 0.8s ease 0.15s;
-  transform: translateY(20px);
-}
-
-.chapter-text {
-  font-size: clamp(1rem, 2.5vw, 1.2rem);
-  color: var(--cream);
-  text-align: center;
-  max-width: 600px;
-  line-height: 1.8;
-  opacity: 0;
-  transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
-  transform: translateY(20px);
-}
-
-.chapter.visible .chapter-label,
-.chapter.visible .chapter-title,
-.chapter.visible .chapter-text {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Dividers */
-.gold-line {
-  width: 60px;
-  height: 1px;
-  background: var(--gold);
-  margin: 1.5rem auto;
-  opacity: 0;
-  transition: opacity 0.8s ease 0.45s, width 0.8s ease 0.45s;
-}
-.chapter.visible .gold-line { opacity: 1; width: 120px; }
-
-/* ============================================================
-   PHOTO FLIP CARDS
-   ============================================================ */
-.card-grid {
+  min-height: 100dvh;
   display: grid;
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 900px;
-  margin-top: 2.5rem;
-  opacity: 0;
-  transition: opacity 0.8s ease 0.5s;
-}
-
-.chapter.visible .card-grid { opacity: 1; }
-
-.card-grid.cols-1 { grid-template-columns: 1fr; max-width: 420px; }
-.card-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
-.card-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
-
-@media (max-width: 600px) {
-  .card-grid.cols-2,
-  .card-grid.cols-3 { grid-template-columns: 1fr 1fr; }
-}
-
-.flip-card {
-  perspective: 1200px;
-  aspect-ratio: 3/4;
-  cursor: pointer;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-}
-
-.flip-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
-  transform-style: preserve-3d;
-}
-
-.flip-card.flipped .flip-card-inner {
-  transform: rotateY(180deg);
-}
-
-.flip-card-front,
-.flip-card-back {
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  overflow: hidden;
-}
-
-.flip-card-front img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.flip-card-front .photo-caption {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: "prev frame next";
+  align-items: center;
+  gap: 0.8rem;
   padding: 1rem;
-  background: linear-gradient(transparent, rgba(0,0,0,0.75));
-  font-size: 0.8rem;
-  color: var(--cream);
-  text-align: center;
 }
 
-.flip-card-back {
-  background: linear-gradient(135deg, var(--warm) 0%, #2a1205 100%);
-  transform: rotateY(180deg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-  border: 1px solid var(--gold);
-}
-
-.flip-card-back p {
-  font-size: clamp(0.85rem, 2vw, 1rem);
-  line-height: 1.7;
-  color: var(--cream);
-  text-align: center;
-  font-style: italic;
-}
-
-.flip-hint {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  background: rgba(201,168,76,0.85);
-  color: #1a1209;
-  font-size: 0.65rem;
-  font-style: normal;
-  padding: 0.2rem 0.5rem;
-  border-radius: 20px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-family: 'Georgia', serif;
-}
-
-/* ============================================================
-   VIDEO SECTIONS
-   ============================================================ */
-.video-chapter {
+.frame-stack {
+  grid-area: frame;
   position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--edge);
+  background: var(--panel);
   overflow: hidden;
 }
 
-.video-chapter video,
-.video-chapter .video-fallback {
+.frame {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  opacity: 0.45;
-}
-
-.video-chapter .chapter-content {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* ============================================================
-   GOAT SECTION
-   ============================================================ */
-#goat {
-  background: radial-gradient(ellipse at center, #2a1f00 0%, var(--deep) 70%);
-}
-
-.goat-emoji {
-  font-size: 4rem;
-  margin-bottom: 1rem;
+  object-fit: contain;
+  object-position: center;
+  display: block;
   opacity: 0;
-  transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
-  transform: scale(0.5) rotate(-10deg);
+  transition: opacity 1800ms ease;
 }
 
-.chapter.visible .goat-emoji {
+.frame.active {
   opacity: 1;
-  transform: scale(1) rotate(0deg);
 }
 
-/* ============================================================
-   FAMILY SECTION
-   ============================================================ */
-#family {
-  background: linear-gradient(to bottom, var(--deep) 0%, #160d00 100%);
-}
-
-/* ============================================================
-   WEDDING SECTION
-   ============================================================ */
-#wedding {
-  background: radial-gradient(ellipse at top, #1a0a1a 0%, var(--deep) 60%);
-}
-
-/* ============================================================
-   FINAL MESSAGE
-   ============================================================ */
-#finale {
-  background: radial-gradient(ellipse at center, #1c1400 0%, var(--deep) 70%);
-  text-align: center;
-}
-
-.finale-message {
-  max-width: 650px;
-  font-size: clamp(1rem, 2.5vw, 1.3rem);
-  line-height: 2;
-  color: var(--cream);
-  opacity: 0;
-  transition: opacity 1s ease 0.6s;
-  font-style: italic;
-  margin-bottom: 2rem;
-}
-
-.chapter.visible .finale-message { opacity: 1; }
-
-.signature {
-  font-size: clamp(1.2rem, 4vw, 2rem);
-  color: var(--gold-light);
-  opacity: 0;
-  transition: opacity 1s ease 1s;
-  letter-spacing: 0.05em;
-}
-
-.chapter.visible .signature { opacity: 1; }
-
-.confetti-btn {
-  margin-top: 2.5rem;
-  padding: 0.9rem 2.5rem;
-  background: transparent;
-  border: 2px solid var(--gold);
-  color: var(--gold-light);
-  font-family: 'Georgia', serif;
-  font-size: 1rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
+.nav-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: 1px solid var(--edge);
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  font-size: 1.5rem;
+  line-height: 1;
   cursor: pointer;
-  border-radius: 40px;
-  transition: background 0.3s, color 0.3s;
-  opacity: 0;
-  transition: opacity 1s ease 1.4s, background 0.3s, color 0.3s;
+  transition: background 140ms ease, transform 140ms ease;
+  touch-action: manipulation;
 }
 
-.chapter.visible .confetti-btn { opacity: 1; }
-
-.confetti-btn:hover {
-  background: var(--gold);
-  color: var(--deep);
+#prevBtn {
+  grid-area: prev;
 }
 
-/* ============================================================
-   CONFETTI CANVAS
-   ============================================================ */
-#confetti-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1000;
+#nextBtn {
+  grid-area: next;
 }
 
-/* ============================================================
-   PROGRESS BAR
-   ============================================================ */
-#progress-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--gold), var(--gold-light));
-  z-index: 999;
-  transition: width 0.2s ease;
-  width: 0%;
+.nav-btn:hover {
+  background: var(--btn-bg-hover);
+  transform: translateY(-1px);
 }
 
-/* ============================================================
-   NAV DOTS
-   ============================================================ */
-#nav-dots {
-  position: fixed;
-  right: 1.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+.nav-btn:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
 }
 
-.nav-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(201,168,76,0.3);
-  border: 1px solid var(--gold);
-  cursor: pointer;
-  transition: background 0.3s, transform 0.3s;
+@media (max-width: 720px) {
+  .stage {
+    grid-template-columns: 1fr;
+    grid-template-areas: "frame";
+    gap: 0;
+    padding: 0.5rem;
+    min-height: 100dvh;
+  }
+
+  .frame-stack {
+    min-height: calc(100dvh - 1rem);
+    height: calc(100dvh - 1rem);
+    border-radius: 10px;
+  }
+
+  .nav-btn {
+    position: fixed;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    z-index: 20;
+    width: 54px;
+    height: 54px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(2px);
+    align-items: center;
+    justify-content: center;
+  }
+
+  #prevBtn {
+    left: max(12px, env(safe-area-inset-left));
+  }
+
+  #nextBtn {
+    right: max(12px, env(safe-area-inset-right));
+  }
 }
 
-.nav-dot.active {
-  background: var(--gold);
-  transform: scale(1.4);
-}
+@media (max-width: 390px) {
+  .frame-stack {
+    min-height: calc(100dvh - 0.5rem);
+    height: calc(100dvh - 0.5rem);
+  }
 
-@media (max-width: 480px) {
-  #nav-dots { display: none; }
-}
-
-/* ============================================================
-   KEYFRAMES
-   ============================================================ */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes bounce {
-  0%, 100% { transform: rotate(45deg) translateY(0); }
-  50%       { transform: rotate(45deg) translateY(6px); }
-}
-
-/* ============================================================
-   SECTION-SPECIFIC BACKGROUNDS
-   ============================================================ */
-#myth {
-  background: linear-gradient(to bottom, #0d0800 0%, var(--deep) 50%, #0d0800 100%);
-}
-
-#crew {
-  background: linear-gradient(to bottom, var(--deep) 0%, #0a0500 100%);
+  .nav-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 1.35rem;
+  }
 }

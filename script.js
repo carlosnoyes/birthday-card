@@ -1,150 +1,124 @@
-/* ============================================================
-   Birthday Card — script.js
-   ============================================================ */
+﻿const frameA = document.getElementById("frameA");
+const frameB = document.getElementById("frameB");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const audioEl = document.getElementById("song");
 
-// ── Intersection Observer: reveal chapters ──────────────────
-const chapters = document.querySelectorAll('.chapter');
-const navDots  = document.querySelectorAll('.nav-dot');
+const FRAME_COUNT = 20;
+const CROSSFADE_MS = 1800;
+const ORIGINAL_MS = 3000;
+const FANTASY_MS = 7000;
 
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-      // Sync nav dot
-      const idx = [...chapters].indexOf(entry.target);
-      navDots.forEach(d => d.classList.remove('active'));
-      if (navDots[idx]) navDots[idx].classList.add('active');
-    }
-  });
-}, { threshold: 0.35 });
-
-chapters.forEach(ch => observer.observe(ch));
-
-// ── Progress bar ────────────────────────────────────────────
-const progressBar = document.getElementById('progress-bar');
-
-window.addEventListener('scroll', () => {
-  const scrollTop    = window.scrollY;
-  const docHeight    = document.documentElement.scrollHeight - window.innerHeight;
-  const pct          = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-  progressBar.style.width = pct + '%';
+const frames = Array.from({ length: FRAME_COUNT }, (_, i) => {
+  const n = i + 1;
+  const ext = n % 2 === 1 ? "jpg" : "png";
+  return `slideshow/${n}.${ext}`;
 });
 
-// ── Nav dots click ───────────────────────────────────────────
-navDots.forEach((dot, i) => {
-  dot.addEventListener('click', () => {
-    chapters[i]?.scrollIntoView({ behavior: 'smooth' });
-  });
-});
+let current = 0;
+let activeEl = frameA;
+let inactiveEl = frameB;
+let advanceTimer = null;
+let transitionToken = 0;
 
-// ── Flip cards ───────────────────────────────────────────────
-document.querySelectorAll('.flip-card').forEach(card => {
-  card.addEventListener('click', () => {
-    card.classList.toggle('flipped');
-  });
-});
-
-// ── Scroll hint click ────────────────────────────────────────
-document.querySelector('.hero-scroll-hint')?.addEventListener('click', () => {
-  chapters[0]?.scrollIntoView({ behavior: 'smooth' });
-});
-
-// ── Video fallback: if src missing, hide video, show img ─────
-document.querySelectorAll('video').forEach(video => {
-  video.addEventListener('error', () => {
-    video.style.display = 'none';
-    const fallback = video.parentElement.querySelector('.video-fallback, #hero-fallback');
-    if (fallback) fallback.style.display = 'block';
-  });
-
-  // Also check if video loads successfully
-  video.addEventListener('canplay', () => {
-    const fallback = video.parentElement.querySelector('.video-fallback, #hero-fallback');
-    if (fallback) fallback.style.display = 'none';
-  });
-});
-
-// ── Confetti ─────────────────────────────────────────────────
-const canvas = document.getElementById('confetti-canvas');
-const ctx    = canvas.getContext('2d');
-let confettiPieces = [];
-let confettiRunning = false;
-
-function resizeCanvas() {
-  canvas.width  = window.innerWidth;
-  canvas.height = window.innerHeight;
+function durationForIndex(index) {
+  return (index % 2 === 0) ? ORIGINAL_MS : FANTASY_MS;
 }
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
 
-function randomBetween(a, b) { return a + Math.random() * (b - a); }
+function clearAdvanceTimer() {
+  clearTimeout(advanceTimer);
+}
 
-const CONFETTI_COLORS = [
-  '#c9a84c', '#f0d080', '#ffffff', '#ffb347',
-  '#ff6b6b', '#a8edea', '#fed6e3', '#ffeaa7'
-];
+function scheduleAdvance() {
+  clearAdvanceTimer();
+  advanceTimer = setTimeout(() => {
+    goNext();
+  }, durationForIndex(current));
+}
 
-function launchConfetti() {
-  const count = 180;
-  confettiPieces = [];
-  for (let i = 0; i < count; i++) {
-    confettiPieces.push({
-      x:     randomBetween(0, canvas.width),
-      y:     randomBetween(-100, -10),
-      w:     randomBetween(8, 16),
-      h:     randomBetween(4, 8),
-      color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
-      vx:    randomBetween(-3, 3),
-      vy:    randomBetween(3, 8),
-      angle: randomBetween(0, Math.PI * 2),
-      spin:  randomBetween(-0.15, 0.15),
-      opacity: 1,
-    });
-  }
-  if (!confettiRunning) {
-    confettiRunning = true;
-    animateConfetti();
+function swapLayers() {
+  const temp = activeEl;
+  activeEl = inactiveEl;
+  inactiveEl = temp;
+}
+
+function showIndex(nextIndex) {
+  transitionToken += 1;
+  const token = transitionToken;
+  const normalized = (nextIndex + FRAME_COUNT) % FRAME_COUNT;
+  const nextSrc = frames[normalized];
+
+  const nextImage = new Image();
+  nextImage.onload = () => {
+    if (token !== transitionToken) {
+      return;
+    }
+    inactiveEl.src = nextSrc;
+    inactiveEl.classList.add("active");
+    activeEl.classList.remove("active");
+
+    setTimeout(() => {
+      if (token !== transitionToken) {
+        return;
+      }
+      swapLayers();
+      current = normalized;
+      scheduleAdvance();
+    }, CROSSFADE_MS);
+  };
+  nextImage.src = nextSrc;
+}
+
+function goNext() {
+  clearAdvanceTimer();
+  showIndex(current + 1);
+}
+
+function goPrev() {
+  clearAdvanceTimer();
+  showIndex(current - 1);
+}
+
+async function tryAutoPlay() {
+  try {
+    audioEl.muted = false;
+    await audioEl.play();
+  } catch {
+    // Browser policy may block autoplay until user interaction.
   }
 }
 
-function animateConfetti() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  confettiPieces.forEach(p => {
-    p.x     += p.vx;
-    p.y     += p.vy;
-    p.angle += p.spin;
-    if (p.y > canvas.height + 20) {
-      p.opacity = Math.max(0, p.opacity - 0.05);
-    }
-    ctx.save();
-    ctx.globalAlpha = p.opacity;
-    ctx.translate(p.x, p.y);
-    ctx.rotate(p.angle);
-    ctx.fillStyle = p.color;
-    ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-    ctx.restore();
+function preloadFrames() {
+  frames.forEach((src) => {
+    const img = new Image();
+    img.src = src;
   });
-
-  // Keep going while any piece is visible
-  if (confettiPieces.some(p => p.opacity > 0)) {
-    requestAnimationFrame(animateConfetti);
-  } else {
-    confettiRunning = false;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
 }
 
-document.getElementById('confetti-btn')?.addEventListener('click', launchConfetti);
+prevBtn.addEventListener("click", goPrev);
+nextBtn.addEventListener("click", goNext);
 
-// ── Auto-launch confetti when finale section becomes visible ─
-const finaleObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      setTimeout(launchConfetti, 1500);
-      finaleObserver.disconnect();
-    }
-  });
-}, { threshold: 0.6 });
+window.addEventListener("keydown", (event) => {
+  if (event.key === "ArrowRight") {
+    event.preventDefault();
+    goNext();
+  }
 
-const finale = document.getElementById('finale');
-if (finale) finaleObserver.observe(finale);
+  if (event.key === "ArrowLeft") {
+    event.preventDefault();
+    goPrev();
+  }
+});
+
+// Retry autoplay after first user interaction if autoplay is blocked initially.
+document.addEventListener("pointerdown", () => {
+  if (audioEl.paused) {
+    tryAutoPlay();
+  }
+}, { once: true });
+
+activeEl.src = frames[current];
+activeEl.classList.add("active");
+preloadFrames();
+scheduleAdvance();
+tryAutoPlay();

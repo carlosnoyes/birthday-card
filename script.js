@@ -21,6 +21,8 @@ let activeEl = frameA;
 let inactiveEl = frameB;
 let advanceTimer = null;
 let transitionToken = 0;
+let audioUnlocked = false;
+const preloadedFrames = new Set();
 
 function durationForIndex(index) {
   return (index % 2 === 0) ? ORIGINAL_MS : FANTASY_MS;
@@ -35,6 +37,7 @@ function scheduleAdvance() {
   advanceTimer = setTimeout(() => {
     goNext();
   }, durationForIndex(current));
+  preloadNearbyFrames(current);
 }
 
 function swapLayers() {
@@ -71,29 +74,91 @@ function showIndex(nextIndex) {
 }
 
 function goNext() {
+  unlockAudio();
   clearAdvanceTimer();
   showIndex(current + 1);
 }
 
 function goPrev() {
+  unlockAudio();
   clearAdvanceTimer();
   showIndex(current - 1);
 }
 
-async function tryAutoPlay() {
+async function primeAudioMuted() {
+  try {
+    audioEl.muted = true;
+    await audioEl.play();
+  } catch {
+    // Some browsers still block autoplay even when muted.
+  }
+}
+
+async function unlockAudio() {
+  if (audioUnlocked) {
+    return;
+  }
   try {
     audioEl.muted = false;
     await audioEl.play();
+    audioUnlocked = true;
+    removeUnlockListeners();
   } catch {
-    // Browser policy may block autoplay until user interaction.
+    // Keep listeners active until a gesture succeeds.
+  }
+}
+
+function preloadFrameByIndex(index) {
+  const normalized = (index + FRAME_COUNT) % FRAME_COUNT;
+  const src = frames[normalized];
+  if (preloadedFrames.has(src)) {
+    return;
+  }
+  preloadedFrames.add(src);
+  const img = new Image();
+  img.src = src;
+}
+
+function preloadNearbyFrames(index) {
+  preloadFrameByIndex(index + 1);
+  preloadFrameByIndex(index + 2);
+}
+
+function onFirstGesture() {
+  unlockAudio();
+}
+
+function removeUnlockListeners() {
+  document.removeEventListener("pointerdown", onFirstGesture);
+  document.removeEventListener("touchstart", onFirstGesture);
+  document.removeEventListener("click", onFirstGesture);
+  document.removeEventListener("keydown", onFirstGesture);
+}
+
+function addUnlockListeners() {
+  document.addEventListener("pointerdown", onFirstGesture);
+  document.addEventListener("touchstart", onFirstGesture, { passive: true });
+  document.addEventListener("click", onFirstGesture);
+  document.addEventListener("keydown", onFirstGesture);
+}
+
+function warmFirstFrames() {
+  for (let i = 0; i < Math.min(3, FRAME_COUNT); i += 1) {
+    preloadFrameByIndex(i);
   }
 }
 
 function preloadFrames() {
-  frames.forEach((src) => {
+  preloadNearbyFrames(current);
+}
+
+function preloadCurrent() {
+  const src = frames[current];
+  if (!preloadedFrames.has(src)) {
+    preloadedFrames.add(src);
     const img = new Image();
     img.src = src;
-  });
+  }
 }
 
 prevBtn.addEventListener("click", goPrev);
@@ -111,15 +176,13 @@ window.addEventListener("keydown", (event) => {
   }
 });
 
-// Retry autoplay after first user interaction if autoplay is blocked initially.
-document.addEventListener("pointerdown", () => {
-  if (audioEl.paused) {
-    tryAutoPlay();
-  }
-}, { once: true });
+addUnlockListeners();
 
 activeEl.src = frames[current];
 activeEl.classList.add("active");
+preloadCurrent();
+warmFirstFrames();
 preloadFrames();
 scheduleAdvance();
-tryAutoPlay();
+primeAudioMuted();
+unlockAudio();

@@ -1,0 +1,233 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Printable Fold Card</title>
+  <style>
+    :root {
+      --ink: #1a1a1a;
+      --accent: #6a4a2a;
+      --page-w: 11in;
+      --page-h: 8.5in;
+      --card-w: 10in;
+      --card-h: 5in;
+      --panel-w: 5in;
+      --side-margin: 0.25in;
+      --top-margin: 1.75in;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: #e8e5de;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .screen-note {
+      width: min(1000px, 94vw);
+      margin: 12px auto;
+      padding: 10px 12px;
+      background: #fff;
+      border: 1px solid #d8d3c8;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .sheet {
+      width: var(--page-w);
+      height: var(--page-h);
+      margin: 0.2in auto;
+      position: relative;
+      background: #ffffff;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+    }
+
+    .card-area {
+      position: absolute;
+      left: var(--side-margin);
+      top: var(--top-margin);
+      width: var(--card-w);
+      height: var(--card-h);
+      display: grid;
+      grid-template-columns: var(--panel-w) var(--panel-w);
+    }
+
+    .panel {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .fold-guide {
+      position: absolute;
+      top: var(--top-margin);
+      left: calc(var(--side-margin) + var(--panel-w));
+      width: 0;
+      height: var(--card-h);
+      border-left: 1px dashed rgba(90, 90, 90, 0.55);
+      transform: translateX(-0.5px);
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .front-cover {
+      background: #0f1720;
+    }
+
+    .front-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    .front-title {
+      position: absolute;
+      left: 8%;
+      bottom: 0.3in;
+      margin: 0;
+      color: #f1cb57;
+      font-family: "Brush Script MT", "Lucida Handwriting", cursive;
+      font-size: 78px;
+      line-height: 1;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .inside-left {
+      padding: 0.28in;
+      background: transparent;
+    }
+
+    .inside-right {
+      padding: 0.28in;
+      display: grid;
+      grid-template-rows: 1fr;
+      background: transparent;
+    }
+
+    .message {
+      font-size: 17px;
+      line-height: 1.45;
+      white-space: pre-line;
+      margin: 0;
+    }
+
+    .message .title {
+      display: block;
+      font-size: 28px;
+      line-height: 1.12;
+      margin-bottom: 0.16in;
+      color: var(--accent);
+    }
+
+    .qr-wrap {
+      text-align: center;
+      align-self: end;
+    }
+
+    .qr {
+      width: 1.6in;
+      height: 1.6in;
+      display: inline-block;
+      border: 1px solid #d6d1c8;
+      padding: 0.06in;
+      background: #fff;
+    }
+
+    .qr-url {
+      margin: 0.07in 0 0;
+      font-size: 10px;
+      color: #555;
+      word-break: break-all;
+    }
+
+    .break-after {
+      page-break-after: always;
+      break-after: page;
+    }
+
+    @page {
+      size: letter landscape;
+      margin: 0;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .screen-note {
+        display: none;
+      }
+
+      .sheet {
+        margin: 0;
+        box-shadow: none;
+      }
+
+      .inside-left,
+      .inside-right {
+        background: transparent !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="screen-note">
+    Print duplex on letter paper, "flip on short edge". Fold on the dashed center line. This layout makes a folded card about 5in x 5in with 0.25in side margins and a square front cover.
+  </div>
+
+  <section class="sheet break-after" aria-label="Outside of card">
+    <div class="fold-guide" aria-hidden="true"></div>
+    <div class="card-area">
+      <div class="panel outside-left"></div>
+      <div class="panel front-cover">
+        <img src="slideshow/20.png" alt="Birthday card front illustration" />
+        <p class="front-title">Happy<br />Birthday<br />Athair</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" aria-label="Inside of card">
+    <div class="fold-guide" aria-hidden="true"></div>
+    <div class="card-area">
+      <div class="panel inside-left">
+        <p class="message"><span class="title">Happy Birthday, Athair (Father)</span>
+You carry a rare and beautiful spirit.
+Nothing in this world is ordinary to you.
+
+You know the deeper truths hidden beneath.
+Truths the rest of us simply cannot see.
+
+I can only imagine how the world must look through your eyes,
+but ChatGPT knows...
+
+Take a look,</p>
+      </div>
+      <div class="panel inside-right">
+        <div class="qr-wrap">
+          <img
+            class="qr"
+            src="https://api.qrserver.com/v1/create-qr-code/?size=420x420&data=https%3A%2F%2Fcarlosnoyes.github.io%2Fbirthday-card%2F"
+            alt="QR code linking to the birthday slideshow"
+          />
+          <p class="qr-url">https://carlosnoyes.github.io/birthday-card/</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
